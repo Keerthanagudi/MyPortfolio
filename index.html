@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Keerthana Reddy Gudi | 3D Portfolio</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            color: #fff;
+        }
+        
+        body {
+            overflow: hidden;
+            background-color: #0a0a18;
+        }
+        
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        
+        #content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+        }
+        
+        #content::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .section {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            transition: opacity 0.5s;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 80%;
+            background-color: rgba(10, 10, 24, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 0 30px rgba(0, 128, 255, 0.3);
+            border: 1px solid rgba(0, 128, 255, 0.3);
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #00d2ff;
+            text-align: center;
+        }
+        
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #3a7bd5;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .skill-card {
+            background-color: rgba(20, 20, 50, 0.8);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(0, 128, 255, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 128, 255, 0.3);
+        }
+        
+        .skill-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #00d2ff;
+            text-align: center;
+        }
+        
+        .skill-list {
+            list-style-type: none;
+        }
+        
+        .skill-list li {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .skill-list li::before {
+            content: "•";
+            color: #3a7bd5;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        
+        .projects-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .project-card {
+            background-color: rgba(20, 20, 50, 0.8);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(0, 128, 255, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 128, 255, 0.3);
+        }
+        
+        .project-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #00d2ff;
+        }
+        
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .project-tag {
+            background-color: rgba(58, 123, 213, 0.3);
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+        }
+        
+        .nav {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+        
+        .nav-btn {
+            background-color: rgba(0, 128, 255, 0.2);
+            border: 1px solid rgba(0, 128, 255, 0.3);
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn:hover {
+            background-color: rgba(0, 128, 255, 0.4);
+        }
+        
+        .certificates-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .certificate-card {
+            background-color: rgba(20, 20, 50, 0.8);
+            border-radius: 10px;
+            padding: 1.2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(0, 128, 255, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .certificate-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 128, 255, 0.3);
+        }
+        
+        .achievements-list {
+            list-style-type: none;
+            margin-top: 1.5rem;
+        }
+        
+        .achievements-list li {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .achievements-list li::before {
+            content: "✓";
+            color: #00d2ff;
+            position: absolute;
+            left: 0;
+        }
+        
+        .education-container {
+            margin-top: 2rem;
+        }
+        
+        .education-item {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: rgba(20, 20, 50, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(0, 128, 255, 0.2);
+        }
+        
+        .education-period {
+            color: #00d2ff;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .education-degree {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .education-location {
+            color: #aaa;
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+        
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #0a0a18;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1s ease-out;
+        }
+        
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loader {
+            width: 100px;
+            height: 100px;
+            border: 5px solid transparent;
+            border-top-color: #00d2ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">
+        <div class="loader"></div>
+    </div>
+    
+    <canvas id="canvas"></canvas>
+    
+    <nav class="nav">
+        <div class="nav-btn" onclick="scrollToSection('home')">Home</div>
+        <div class="nav-btn" onclick="scrollToSection('about')">About</div>
+        <div class="nav-btn" onclick="scrollToSection('skills')">Skills</div>
+        <div class="nav-btn" onclick="scrollToSection('projects')">Projects</div>
+        <div class="nav-btn" onclick="scrollToSection('education')">Education</div>
+        <div class="nav-btn" onclick="scrollToSection('certificates')">Certificates</div>
+    </nav>
+    
+    <div id="content">
+        <!-- Home Section -->
+        <section id="home" class="section">
+            <div class="container">
+                <h1>Keerthana Reddy Gudi</h1>
+                <h2>Computer Science Professional</h2>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span>📧</span>
+                        <span>keerthanagudi08@gmail.com</span>
+                    </div>
+                    <div class="contact-item">
+                        <span>📱</span>
+                        <span>+16822039459</span>
+                    </div>
+                    <div class="contact-item">
+                        <span>📍</span>
+                        <span>Dallas, TX, USA</span>
+                    </div>
+                    <div class="contact-item">
+                        <span>🔗</span>
+                        <span>linkedin.com/in/gudi-keerthana-reddy-ba91aa203</span>
+                    </div>
+                </div>
+                <p style="text-align: center;">Computer Science Master's student with expertise in Machine Learning, AI, and Data Analysis. Passionate about building intelligent systems that solve real-world problems.</p>
+            </div>
+        </section>
+        
+        <!-- About Section -->
+        <section id="about" class="section">
+            <div class="container">
+                <h2>About Me</h2>
+                <p>I am a Computer Science graduate student at the University of Texas at Arlington, specializing in Machine Learning, AI, and Data Analysis. With a strong foundation in programming languages like Python, Java, and C, I focus on developing innovative solutions that address complex challenges.</p>
+                <p>My technical expertise includes Machine Learning algorithms, NLP techniques, and data visualization. I have successfully completed various projects in semantic search, cyberbullying detection, intrusion detection, and fake news identification.</p>
+                <p>Currently pursuing my Master's degree with a GPA of 3.778, I am continuously enhancing my skills through certifications and practical applications of cutting-edge technologies.</p>
+                
+                <div class="achievements-container">
+                    <h3>Achievements</h3>
+                    <ul class="achievements-list">
+                        <li>Earned PCCET Global Certification by Palo Alto Networks Cybersecurity Academy</li>
+                        <li>Served as Class Representative for 4 semesters (2021-2023), managing 60+ students</li>
+                        <li>Developed a Google Assistant Chatbot during a workshop using DialogFlow</li>
+                        <li>Participated in Hackathon 2019 organized by BVRIT</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Skills Section -->
+        <section id="skills" class="section">
+            <div class="container">
+                <h2>Skills & Expertise</h2>
+                <div class="skills-container">
+                    <div class="skill-card">
+                        <div class="skill-title">Programming Languages</div>
+                        <ul class="skill-list">
+                            <li>Python</li>
+                            <li>Java</li>
+                            <li>C</li>
+                        </ul>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-title">Machine Learning</div>
+                        <ul class="skill-list">
+                            <li>Scikit-learn</li>
+                            <li>NLTK</li>
+                            <li>TF-IDF</li>
+                            <li>Classification Algorithms</li>
+                        </ul>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-title">Web Technologies</div>
+                        <ul class="skill-list">
+                            <li>HTML</li>
+                            <li>CSS</li>
+                        </ul>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-title">Database & Tools</div>
+                        <ul class="skill-list">
+                            <li>SQL</li>
+                            <li>PowerBI</li>
+                            <li>Windows OS</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Projects Section -->
+        <section id="projects" class="section">
+            <div class="container">
+                <h2>Projects</h2>
+                <div class="projects-container">
+                    <div class="project-card">
+                        <h3 class="project-title">Semantic Search Engine</h3>
+                        <div class="project-tags">
+                            <span class="project-tag">Machine Learning</span>
+                            <span class="project-tag">Python</span>
+                            <span class="project-tag">NLP</span>
+                            <span class="project-tag">Elasticsearch</span>
+                        </div>
+                        <p>Architected a high-performance semantic search engine using Elasticsearch and sentence-transformers to enhance text retrieval. Automated dataset acquisition via Kaggle API and deployed a Streamlit-based interactive web interface for real-time query execution.</p>
+                    </div>
+                    <div class="project-card">
+                        <h3 class="project-title">Cyber Bullying Detection</h3>
+                        <div class="project-tags">
+                            <span class="project-tag">Machine Learning</span>
+                            <span class="project-tag">Python</span>
+                            <span class="project-tag">NLP</span>
+                            <span class="project-tag">Flask</span>
+                        </div>
+                        <p>Developed a cyberbullying detection model using Logistic Regression on a dataset of 5,000 tweets, achieving high classification accuracy. Built and launched a Flask-based real-time classification web interface, improving user accessibility.</p>
+                    </div>
+                    <div class="project-card">
+                        <h3 class="project-title">Intrusion Detection with Feature Selection</h3>
+                        <div class="project-tags">
+                            <span class="project-tag">Machine Learning</span>
+                            <span class="project-tag">Feature Selection</span>
+                            <span class="project-tag">Python</span>
+                        </div>
+                        <p>Engineered an intrusion detection system using the UNSW-NB15 dataset with Chi-square feature selection to improve detection accuracy. Refined a Random Forest classifier, reducing false positives while strengthening anomaly detection.</p>
+                    </div>
+                    <div class="project-card">
+                        <h3 class="project-title">Fake News Detection</h3>
+                        <div class="project-tags">
+                            <span class="project-tag">Machine Learning</span>
+                            <span class="project-tag">NLP</span>
+                            <span class="project-tag">Python</span>
+                        </div>
+                        <p>Designed an NLP-powered fake news detection system using TF-IDF vectorization to enhance processing speed. Optimized Decision Tree models, improving classification accuracy for detecting misinformation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Education Section -->
+        <section id="education" class="section">
+            <div class="container">
+                <h2>Education</h2>
+                <div class="education-container">
+                    <div class="education-item">
+                        <div class="education-period">08/2023 – 05/2025 (Expected)</div>
+                        <div class="education-degree">Master of Science in Computer Science | GPA: 3.778</div>
+                        <div class="education-location">University of Texas at Arlington, Texas, USA</div>
+                        <p>CourseWork: Data Mining, Machine Learning, Artificial Intelligence, Cloud Computing Big Data, Data Analysis and Modeling.</p>
+                    </div>
+                    <div class="education-item">
+                        <div class="education-period">08/2019 – 06/2023</div>
+                        <div class="education-degree">Bachelor of Technology in Computer Science Engineering | GPA: 8.98</div>
+                        <div class="education-location">B V Raju Institute of Technology, Telangana, India</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Certificates Section -->
+        <section id="certificates" class="section">
+            <div class="container">
+                <h2>Certifications</h2>
+                <div class="certificates-container">
+                    <div class="certificate-card">
+                        <p>PwC Power BI Virtual Experience Program — Forage</p>
+                    </div>
+                    <div class="certificate-card">
+                        <p>Generative AI Fundamentals — Databricks</p>
+                    </div>
+                    <div class="certificate-card">
+                        <p>AICTE NEAT - Cyber Security Virtual Internship</p>
+                    </div>
+                    <div class="certificate-card">
+                        <p>Programming for Everybody (Getting started with Python) — Coursera</p>
+                    </div>
+                    <div class="certificate-card">
+                        <p>Cybersecurity Essentials — Cisco Networking Academy</p>
+                    </div>
+                    <div class="certificate-card">
+                        <p>AI for everyone — Coursera</p>
+                    </div>
+                    <div class="certificate-card">
+                        <p>Introduction to Packet Tracer — Cisco Networking Academy</p>
+                    </div>
+                    <div class="certificate-card">
+                        <p>Introduction to Cybersecurity — Cisco Networking Academy</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Three.js setup
+        let scene, camera, renderer;
+        let particles, particleSystem;
+        let raycaster, mouse;
+        let currentSection = 'home';
+        
+        // Initialize Three.js scene
+        function init() {
+            // Create scene
+            scene = new THREE.Scene();
+            
+            // Setup camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 50;
+            
+            // Setup renderer
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            
+            // Create particle system
+            createParticles();
+            
+            // Setup raycaster for interaction
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+            
+            // Event listeners
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('mousemove', onMouseMove);
+            document.getElementById('content').addEventListener('scroll', onScroll);
+            
+            // Start animation
+            animate();
+            
+            // Hide loading screen after a short delay
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+            }, 1500);
+        }
+        
+        // Create particles effect
+        function createParticles() {
+            const particleCount = 1500;
+            const particles = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const velocities = [];
+            const sizes = new Float32Array(particleCount);
+            
+            for (let i = 0; i < particleCount; i++) {
+                // Position
+                positions[i * 3] = (Math.random() - 0.5) * 200;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 200;
+                
+                // Velocity
+                velocities.push({
+                    x: (Math.random() - 0.5) * 0.05,
+                    y: (Math.random() - 0.5) * 0.05,
+                    z: (Math.random() - 0.5) * 0.05
+                });
+                
+                // Size
+                sizes[i] = Math.random() * 2;
+            }
+            
+            particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particles.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+            
+            // Create shader material
+            const particleMaterial = new THREE.ShaderMaterial({
+                vertexShader: `
+                    attribute float size;
+                    varying vec3 vColor;
+                    void main() {
+                        vColor = vec3(0.0, 0.8, 1.0); // Blue color
+                        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                        gl_PointSize = size * (300.0 / -mvPosition.z);
+                        gl_Position = projectionMatrix * mvPosition;
+                    }
+                `,
+                fragmentShader: `
+                    varying vec3 vColor;
+                    void main() {
+                        vec2 xy = gl_PointCoord.xy - vec2(0.5);
+                        float radius = length(xy);
+                        if (radius > 0.5) discard;
+                        float alpha = 1.0 - radius * 2.0;
+                        gl_FragColor = vec4(vColor, alpha);
+                    }
+                `,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+            
+            // Create particle system
+            particleSystem = new THREE.Points(particles, particleMaterial);
+            particleSystem.velocities = velocities;
+            scene.add(particleSystem);
+        }
+        
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Animate particles
+            const positions = particleSystem.geometry.attributes.position.array;
+            const velocities = particleSystem.velocities;
+            
+            for (let i = 0; i < positions.length / 3; i++) {
+                positions[i * 3] += velocities[i].x;
+                positions[i * 3 + 1] += velocities[i].y;
+                positions[i * 3 + 2] += velocities[i].z;
+                
+                // Boundary check
+                if (Math.abs(positions[i * 3]) > 100) velocities[i].x *= -1;
+                if (Math.abs(positions[i * 3 + 1]) > 100) velocities[i].y *= -1;
+                if (Math.abs(positions[i * 3 + 2]) > 100) velocities[i].z *= -1;
+            }
+            
+            particleSystem.geometry.attributes.position.needsUpdate = true;
+            
+            // Rotate particle system
+            particleSystem.rotation.y += 0.001;
+            
+            // Render scene
+            renderer.render(scene, camera);
+        }
+        
+        // Window resize handler
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // Mouse move handler
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            // Camera tilt based on mouse position
+            const tiltAmount = 0.05;
+            camera.position.x = -mouse.x * 10;
+            camera.position.y = -mouse.y * 10;
+            camera.lookAt(scene.position);
+        }
+        
+        // Scroll handler
+        function onScroll() {
+            const contentElement = document.getElementById('content');
+            const scrollPosition = contentElement.scrollTop;
+            const windowHeight = window.innerHeight;
+            
+            // Calculate active section
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                
+                if (scrollPosition >= sectionTop - windowHeight / 2 && 
+                    scrollPosition < sectionTop + sectionHeight - windowHeight / 2) {
+                    const sectionId = section.getAttribute('id');
+                    if (currentSection !== sectionId) {
+                        currentSection = sectionId;
+                        updateParticles(currentSection);
+                    }
+                }
+            });
+        }
+        
+        // Update particles based on active section
+        function updateParticles(sectionId) {
+            // Clear any existing animations
+            TWEEN.removeAll();
+            
+            // Apply different effects based on section
+            switch(sectionId) {
+                case 'home':
+                    // Expand particles
+                    new TWEEN.Tween(particleSystem.scale)
+                        .to({ x: 1, y: 1, z: 1 }, 1000)
+                        .easing(TWEEN.Easing.Elastic.Out)
+                        .start();
+                    break;
+                    
+                case 'about':
+                    // Contract particles
+                    new TWEEN.Tween(particleSystem.scale)
+                        .to({ x: 0.7, y: 0.7, z: 0.7 }, 1000)
+                        .easing(TWEEN.Easing.Elastic.Out)
+                        .start();
+                    break;
+                    
+                case 'skills':
+                    // Form a grid pattern
+                    const positions = particleSystem.geometry.attributes.position.array;
+                    const originalPositions = positions.slice();
+                    
+                    // Save current positions
+                    const targetPositions = new Float32Array(positions.length);
+                    
+                    // Create grid pattern
+                    for (let i = 0; i < positions.length / 3; i++) {
+                        const x = ((i % 20) - 10) * 5;
+                        const y = (Math.floor(i / 20) % 20 - 10) * 5;
+                        const z = (Math.floor(i / 400) - 2) * 20;
+                        
+                        targetPositions[i * 3] = x;
+                        targetPositions[i * 3 + 1] = y;
+                        targetPositions[i * 3 + 2] = z;
+                    }
+                    
+                    // Animate to grid
+                    const positionTween = {value: 0};
+                    new TWEEN.Tween(positionTween)
+                        .to({value: 1}, 2000)
+                        .easing(TWEEN.Easing.Quadratic.InOut)
+                        .onUpdate(() => {
+                            for (let i = 0; i < positions.length; i++) {
+                                positions[i] = originalPositions[i] * (1 - positionTween.value) + 
+                                              targetPositions[i] * positionTween.value;
+                            }
+                            particleSystem.geometry.attributes.position.needsUpdate = true;
+                        })
+                        .start();
+                    break;
+                    
+                case 'projects':
+                    // Spiral formation
+                    new TWEEN.Tween(particleSystem.rotation)
+                        .to({ x: Math.PI * 2, y: Math.PI, z: Math.PI / 2 }, 2000)
+                        .easing(TWEEN.Easing.Quadratic.InOut)
+                        .start();
+                    break;
+                    
+                case 'education':
+                    // Book shape
+                    new TWEEN.Tween(particleSystem.rotation)
+                        .to({ x: 0, y: 0, z: 0 }, 1500)
+                        .easing(TWEEN.Easing.Quadratic.InOut)
+                        .start();
+                    
+                    // Flatten into pages
+                    new TWEEN.Tween(particleSystem.scale)
+                        .to({.to({ x: 2, y: 0.2, z: 1.5 }, 1500)
+                        .easing(TWEEN.Easing.Quadratic.InOut)
+                        .start();
+                    break;
+                    
+                case 'certificates':
+                    // Create a floating certificates effect
+                    new TWEEN.Tween(particleSystem.scale)
+                        .to({ x: 1.2, y: 1.2, z: 1.2 }, 1000)
+                        .easing(TWEEN.Easing.Elastic.Out)
+                        .start();
+                    
+                    new TWEEN.Tween(particleSystem.rotation)
+                        .to({ x: Math.PI / 6, y: Math.PI / 4, z: 0 }, 1500)
+                        .easing(TWEEN.Easing.Quadratic.InOut)
+                        .start();
+                    break;
+            }
+        }
+        
+        // Scroll to section function
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const contentElement = document.getElementById('content');
+            
+            contentElement.scrollTo({
+                top: section.offsetTop,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Update TWEEN animations
+        function updateTween() {
+            TWEEN.update();
+            requestAnimationFrame(updateTween);
+        }
+        
+        // Initialize the scene when page loads
+        window.onload = function() {
+            init();
+            updateTween();
+        };
+    </script>
+</body>
+</html>
